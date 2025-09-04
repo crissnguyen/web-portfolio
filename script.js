@@ -13,6 +13,34 @@ document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', 
     navMenu.classList.remove('active');
 }));
 
+// Theme Toggle with persistence
+const themeToggleBtn = document.querySelector('.theme-toggle');
+const themeIcon = themeToggleBtn ? themeToggleBtn.querySelector('i') : null;
+
+function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('dark', isDark);
+    if (themeIcon) {
+        themeIcon.classList.toggle('fa-moon', !isDark);
+        themeIcon.classList.toggle('fa-sun', isDark);
+    }
+}
+
+(function initTheme() {
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = saved || (prefersDark ? 'dark' : 'light');
+    applyTheme(theme);
+})();
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
+    });
+}
+
 // Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -31,10 +59,10 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
     if (window.scrollY > 100) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+        navbar.style.background = document.body.classList.contains('dark') ? 'rgba(15, 18, 33, 0.95)' : 'rgba(255, 255, 255, 0.98)';
         navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
     } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+        navbar.style.background = document.body.classList.contains('dark') ? 'rgba(15, 18, 33, 0.9)' : 'rgba(255, 255, 255, 0.95)';
         navbar.style.boxShadow = 'none';
     }
 });
@@ -232,15 +260,35 @@ document.querySelectorAll('.stat-number').forEach(stat => {
     statsObserver.observe(stat);
 });
 
-// Project card hover effects
+// Project card 3D tilt effect
 document.querySelectorAll('.project-card').forEach(card => {
+    const tiltStrength = 12; // degrees
+    const translateLift = 12; // px
+
+    function handleMove(e) {
+        const rect = card.getBoundingClientRect();
+        const cardX = e.clientX - rect.left;
+        const cardY = e.clientY - rect.top;
+        const percentX = (cardX / rect.width) - 0.5;
+        const percentY = (cardY / rect.height) - 0.5;
+        const rotateY = percentX * tiltStrength * 2; // left/right
+        const rotateX = -percentY * tiltStrength * 2; // up/down
+        card.style.transform = `translateY(-${translateLift}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    }
+
+    function resetTilt() {
+        card.style.transform = 'translateY(0) rotateX(0deg) rotateY(0deg)';
+        card.style.transition = 'transform 0.25s ease';
+        setTimeout(() => {
+            card.style.transition = 'transform 0.1s ease';
+        }, 250);
+    }
+
     card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-10px) scale(1.02)';
+        card.style.transition = 'transform 0.1s ease';
     });
-    
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0) scale(1)';
-    });
+    card.addEventListener('mousemove', handleMove);
+    card.addEventListener('mouseleave', resetTilt);
 });
 
 // Social links hover effect
@@ -313,3 +361,26 @@ window.addEventListener('scroll', () => {
     const scrollPercent = (scrollTop / scrollHeight) * 100;
     progressBar.style.width = scrollPercent + '%';
 });
+
+// Scrollspy for active nav link
+const sections = Array.from(document.querySelectorAll('section[id]'));
+const linkMap = new Map();
+
+document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    linkMap.set(id, link);
+});
+
+const scrollSpyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        const id = entry.target.id;
+        const link = linkMap.get(id);
+        if (!link) return;
+        if (entry.isIntersecting) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+}, { threshold: 0.6 });
+
+sections.forEach(section => scrollSpyObserver.observe(section));

@@ -14,8 +14,55 @@ body {
     line-height: 1.6;
     color: #333;
     overflow-x: hidden;
+    background: #ffffff;
 }
 
+/* Theme: Dark Mode */
+body.dark {
+    background: #0f1221;
+    color: #e6e6f0;
+}
+
+body.dark .navbar {
+    background: rgba(15, 18, 33, 0.9);
+}
+
+body.dark .nav-link {
+    color: #d5d7ff;
+}
+
+body.dark .nav-link:hover,
+body.dark .nav-link.active {
+    color: #ffd54a;
+}
+
+body.dark .btn-secondary {
+    color: #e6e6f0;
+    border-color: #e6e6f0;
+}
+
+body.dark .btn-secondary:hover {
+    background: #e6e6f0;
+    color: #4f5bd5;
+}
+
+body.dark .about { background: #0b0e1a; }
+body.dark .projects { background: #0b0e1a; }
+body.dark .skills { background: #0f1221; }
+
+body.dark .feature,
+body.dark .project-card {
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+body.dark .contact-item { background: rgba(255, 255, 255, 0.06); }
+body.dark .project-overlay { background: rgba(79, 91, 213, 0.9); }
+
+body.dark .footer { background: #0b0e1a; }
+
+/* Containers */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -58,6 +105,37 @@ body {
     gap: 2rem;
 }
 
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,0,0.08);
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4f5bd5;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(79, 91, 213, 0.25);
+}
+
+body.dark .theme-toggle {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.12);
+    color: #ffd54a;
+}
+
 .nav-link {
     text-decoration: none;
     color: #333;
@@ -81,7 +159,8 @@ body {
     transition: width 0.3s ease;
 }
 
-.nav-link:hover::after {
+.nav-link:hover::after,
+.nav-link.active::after {
     width: 100%;
 }
 
@@ -99,12 +178,16 @@ body {
     transition: 0.3s;
 }
 
+body.dark .bar { background: #e6e6f0; }
+
 /* Hero Section */
 .hero {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-image: linear-gradient(135deg, rgba(102, 126, 234, 0.75) 0%, rgba(118, 75, 162, 0.75) 100%), url('image/IMG_4154_jpg.JPG');
+    background-size: cover;
+    background-position: center;
     color: white;
     position: relative;
     overflow: hidden;
@@ -119,6 +202,35 @@ body {
     bottom: 0;
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
     opacity: 0.3;
+}
+
+.hero-decor {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.hero-decor::before,
+.hero-decor::after {
+    content: '';
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+}
+
+.hero-decor::before {
+    top: -80px;
+    left: -80px;
+    background: radial-gradient(closest-side, #ffd54a, transparent 70%);
+}
+
+.hero-decor::after {
+    bottom: -120px;
+    right: -120px;
+    background: radial-gradient(closest-side, #8a63d2, transparent 70%);
 }
 
 .hero-container {
@@ -248,6 +360,24 @@ body {
     opacity: 0.8;
 }
 
+/* Wave Divider */
+.wave-divider {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    line-height: 0;
+    color: #f8f9fa;
+}
+
+body.dark .wave-divider { color: #0b0e1a; }
+
+.wave-divider svg {
+    display: block;
+    width: 100%;
+    height: 100px;
+}
+
 .scroll-indicator {
     position: absolute;
     bottom: 2rem;
@@ -329,11 +459,12 @@ body {
     background: white;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .feature:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
 
 .feature i {
@@ -420,6 +551,8 @@ body {
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
 }
 
 .project-card:hover {
@@ -659,6 +792,8 @@ body {
         box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
         padding: 2rem 0;
     }
+
+    body.dark .nav-menu { background-color: #0f1221; }
 
     .nav-menu.active {
         left: 0;
